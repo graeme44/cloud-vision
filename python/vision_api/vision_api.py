@@ -22,12 +22,17 @@ To run the example, install the necessary libraries by running:
 
 Import this module and use the VisionAPI class to detect labels/text/logo's from given images, E.g.:
 
+    import vision_api
+    vision = vision_api.VisionAPI()
+    f = open('test_image.png', 'rb')
+    vision.label_image(f)
+    vision.detect_text(f)
+    vision.detect_logo(f)
+    vision.safe_search(f)
+
 """
 
-import argparse
 import base64
-import httplib2
-
 from googleapiclient import discovery
 from oauth2client.client import GoogleCredentials
 
@@ -47,9 +52,7 @@ class VisionAPI(object):
         api_request = self.generate_request(image, detection_type, max_results)
         service_request = self.service.images().annotate(body=api_request)
         response = service_request.execute()
-        print(response)
-        label = response['responses'][0]['labelAnnotations']
-        return label
+        return response
 
     def detect_text(self, image):
         """ Use the Vison API to detect text in the image given. """
@@ -57,9 +60,7 @@ class VisionAPI(object):
         api_request = self.generate_request(image, detection_type)
         service_request = self.service.images().annotate(body=api_request)
         response = service_request.execute()
-        print(response)
-        label = response['responses'][0]['textAnnotations']
-        return label
+        return response
 
     def detect_logo(self, image, max_results=1):
         """ Use the Vison API to detect logo in the image given. """
@@ -67,9 +68,7 @@ class VisionAPI(object):
         api_request = self.generate_request(image, detection_type, max_results)
         service_request = self.service.images().annotate(body=api_request)
         response = service_request.execute()
-        print(response)
-        label = response['responses'][0]['logoAnnotations']
-        return label
+        return response
 
     def safe_search(self, image):
         """ Use te Vision API to get safe search annotations for image. """
@@ -77,13 +76,11 @@ class VisionAPI(object):
         api_request = self.generate_request(image, detection_type)
         service_request = self.service.images().annotate(body=api_request)
         response = service_request.execute()
-        print(response)
-        label = response['responses'][0]['safeSearchAnnotation']
-        return label
+        return response
 
     @staticmethod
     def generate_request(image, detection_type=None, max_results=1):
-        """ """
+        """ Generate request dictionary. """
         request_list = []
         image_content = base64.b64encode(image.read())
         image.seek(0)
